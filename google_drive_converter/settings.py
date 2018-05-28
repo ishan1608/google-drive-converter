@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'google_drive_converter.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'google_drive_converter_dev',
+        'USER': 'google_drive_converter',
+        'PASSWORD': 'google_drive_converter',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -120,3 +124,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
+
+# Import local settings (if any)
+try:
+    from local_settings import *  # noqa
+except ImportError as e:
+    print('Exception importing local_settings [e={}]'.format(e))
