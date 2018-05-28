@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Google Drive Converter</title>
+</head>
+<body>
+Google Drive Converter
+
+{% if success %}
+    <p>URL submitted successfully</p>
+{% elif success == False %}
+    <p>URL submission failed</p>
+{% endif %}
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Convert</button>
+</form>
+</body>
+</html>
