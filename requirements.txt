@@ -1,3 +1,4 @@
+boto3
 Django<2.1
 ffmpy<=0.3
 ipdb

@@ -1,6 +1,7 @@
 from urllib.parse import urlparse
 
 import requests
+import boto3
 from ffmpy import FFmpeg
 
 
@@ -52,3 +53,12 @@ class DriveDownloader(object):
             for chunk in response.iter_content(CHUNK_SIZE):
                 if chunk:  # filter out keep-alive new chunks
                     f.write(chunk)
+
+
+class S3Uploader(object):
+
+    @classmethod
+    def upload(cls, file_path):
+        s3 = boto3.resource('s3')
+        uploaded_file = s3.Bucket('google-drive-converter').upload_file(file_path, 'performance-pattern.mp4', Callback=print)
+        print('Upload to S3 finished')
