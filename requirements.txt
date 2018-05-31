@@ -3,3 +3,4 @@ ffmpy<=0.3
 ipdb
 psycopg2>=2.7,<2.8 --no-binary psycopg2
 pytz<2018.5
+requests
