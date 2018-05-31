@@ -58,7 +58,7 @@ class DriveDownloader(object):
 class S3Uploader(object):
 
     @classmethod
-    def upload(cls, file_path):
+    def upload(cls, file_path, file_key):
         s3 = boto3.resource('s3')
-        uploaded_file = s3.Bucket('google-drive-converter').upload_file(file_path, 'performance-pattern.mp4', Callback=print)
+        s3.Bucket('google-drive-converter').upload_file(file_path, file_key, Callback=print)
         print('Upload to S3 finished')
