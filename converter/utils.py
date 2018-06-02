@@ -3,17 +3,51 @@ from urllib.parse import urlparse
 import requests
 import boto3
 from ffmpy import FFmpeg
+import os
 
 
 class VideoConverter(object):
     @classmethod
-    def convert(cls):
+    def convert(cls, input_path, destination_path, log_path, quality):
+        resolution_map = {
+            '144p': {
+                'width': 256,
+                'height': 144
+            },
+            '240p': {
+                'width': 426,
+                'height': 240
+            },
+            '360p': {
+                'width': 640,
+                'height': 360
+            },
+            '480p': {
+                'width': 854,
+                'height': 480
+            },
+            '720p': {
+                'width': 1280,
+                'height': 720
+            },
+            '1080p': {
+                'width': 1920,
+                'height': 1080
+            },
+        }
+        # Cleanup the destination path
+        if os.path.exists(destination_path):
+            os.remove(destination_path)
+
+        dimensions = resolution_map[quality]
         ff = FFmpeg(
-            inputs={'input.avi': None},
-            outputs={'output.mp4': '-c:a aac -b:a 128k -c:v libx264 -crf 23 -vf scale=320:240'}
+            inputs={input_path: None},
+            outputs={destination_path: '-c:a aac -b:a 128k -c:v libx264 -crf 23 -vf scale={width}:{height}'.format(
+                width=dimensions['width'], height=dimensions['height'])
+            }
         )
         print(ff.cmd)
-        with open('conversion-log.txt', 'w+') as log_file:
+        with open(log_path, 'w+') as log_file:
             ff.run(stdout=log_file, stderr=log_file)
             print('conversion finished')
 
