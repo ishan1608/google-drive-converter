@@ -1,6 +1,7 @@
 import os
+from django.core.mail import send_mail
 
-from django.db.models import CharField, NullBooleanField
+from django.db.models import CharField, NullBooleanField, EmailField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
 
@@ -24,12 +25,14 @@ class DriveJob(TimeStampedModel):
     upload_status = NullBooleanField()
     result_link = CharField(max_length=2048, null=True)
     quality = CharField(max_length=8, choices=QUALITY_CHOICES, default='360p')
+    recipient_email = EmailField()
 
     @classmethod
-    def initialize_job(cls, shareable_link, quality):
+    def initialize_job(cls, shareable_link, quality, recipient):
         drive_job = DriveJob.objects.create(
             drive_shareable_link=shareable_link,
-            quality=quality
+            quality=quality,
+            recipient_email=recipient
         )
         drive_job.execute()
 
@@ -67,3 +70,18 @@ class DriveJob(TimeStampedModel):
 
         # Delete Converted File
         os.remove(output_file_path)
+
+        # Send email
+
+        send_mail(
+            'Your download is ready',
+'''The file you requested is ready to be downloaded:
+Submitted Link: {}
+Chosen Quality: {}
+Download LInk: {}
+--
+http://www.ishan1608.space
+'''.format(self.drive_shareable_link, self.quality, self.result_link),
+            'notifications-no-reply@ishan1608.space',
+            [self.recipient_email]
+        )
