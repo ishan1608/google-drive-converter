@@ -83,3 +83,7 @@ modules.xml
 
 
 # End of https://www.gitignore.io/api/django,pycharm+all
+
+*.mp4
+!downloaded/.gitkeep
+downloaded/*
