@@ -1,5 +1,6 @@
 boto3
 Django<2.1
+django-model-utils>=3.1.2,<3.2
 ffmpy<=0.3
 ipdb
 psycopg2>=2.7,<2.8 --no-binary psycopg2
