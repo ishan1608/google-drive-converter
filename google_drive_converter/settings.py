@@ -134,6 +134,8 @@ EMAIL_BACKEND = 'django_ses.SESBackend'
 AWS_SES_REGION_NAME = 'us-west-2'
 AWS_SES_REGION_ENDPOINT = 'email.us-west-2.amazonaws.com'
 
+CELERY_ENABLED = True
+
 # Import local settings (if any)
 try:
     from local_settings import *  # noqa

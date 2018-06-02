@@ -1,6 +1,7 @@
 import os
-from django.core.mail import send_mail
 
+from django.conf import settings
+from django.core.mail import send_mail
 from django.db.models import CharField, NullBooleanField, EmailField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -29,19 +30,24 @@ class DriveJob(TimeStampedModel):
 
     @classmethod
     def initialize_job(cls, shareable_link, quality, recipient):
+        from celery_tasks import conversion_task
+
         drive_job = DriveJob.objects.create(
             drive_shareable_link=shareable_link,
             quality=quality,
             recipient_email=recipient
         )
-        drive_job.execute()
+        if settings.CELERY_ENABLED:
+            conversion_task.delay(drive_job.id)
+        else:
+            drive_job.execute()
 
     def execute(self):
-        print(u'Execute Job: {}, with quality: {} and link: {}'.format(self.id, self.quality, self.drive_shareable_link))
+        print('Execute Job: {}, with quality: {} and link: {}'.format(self.id, self.quality, self.drive_shareable_link))
         self.download_status = False
         self.save()
         # Download File
-        downloaded_file_path = u'downloaded/{}'.format(self.id)
+        downloaded_file_path = 'downloaded/{}'.format(self.id)
         DriveDownloader().download_shareable_link(self.drive_shareable_link, downloaded_file_path)
 
         self.download_status = True
@@ -49,8 +55,8 @@ class DriveJob(TimeStampedModel):
         self.save()
 
         # Convert File
-        output_file_path = u'downloaded/output-{}.mp4'.format(self.id)
-        log_path = u'downloaded/log-{}.log'.format(self.id)
+        output_file_path = 'downloaded/output-{}.mp4'.format(self.id)
+        log_path = 'downloaded/log-{}.log'.format(self.id)
         VideoConverter.convert(downloaded_file_path, output_file_path, log_path, self.quality)
 
         self.conversion_status = True
@@ -65,7 +71,7 @@ class DriveJob(TimeStampedModel):
         S3Uploader.upload(output_file_path, converted_path)
 
         self.upload_status = True
-        self.result_link = u'https://s3.amazonaws.com/google-drive-converter/{}'.format(converted_path)
+        self.result_link = 'https://s3.amazonaws.com/google-drive-converter/{}'.format(converted_path)
         self.save()
 
         # Delete Converted File
@@ -85,3 +91,6 @@ http://www.ishan1608.space
             'notifications-no-reply@ishan1608.space',
             [self.recipient_email]
         )
+
+    def __str__(self):
+        return 'Job: {}:{}'.format(self.id, self.drive_shareable_link)
