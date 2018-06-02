@@ -12,4 +12,4 @@ class DriveUrlForm(forms.Form):
     quality = ChoiceField(choices=DriveJob.QUALITY_CHOICES, required=True, initial='360p')
 
     def save(self):
-        return 'Downloading {}'.format(self.cleaned_data['document_url'])
+        DriveJob.initialize_job(self.cleaned_data['document_url'], self.cleaned_data['quality'])
