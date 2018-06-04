@@ -9,6 +9,7 @@ Google Drive Converter
 
 {% if success %}
     <p>URL submitted successfully</p>
+    <p>You can check the status <a href="{{ status_url }}">here</a> </p>
 {% elif success == False %}
     <p>URL submission failed</p>
 {% endif %}

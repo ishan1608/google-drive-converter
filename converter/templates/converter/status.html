@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Status {{ id }}</title>
+</head>
+<body>
+<p>Job ID: {{ id }}</p>
+<p>Google Drive Link: {{ drive_job.drive_shareable_link }}</p>
+<p>Selected Quality: {{ drive_job.quality }}</p>
+<p>Submitted Email: {{ drive_job.recipient_email }}</p>
+{% if drive_job.result_link %}
+    <p>You can download the converted video from: <a href="{{ drive_job.result_link }}">{{ drive_job.result_link }}</a></p>
+{% else %}
+    <p>Download link not available yet</p>
+{% endif %}
+{% if drive_job.download_status is None %}
+    <p>Download: Not Started</p>
+{% elif drive_job.download_status %}
+    <p>Download: Completed</p>
+{% else %}
+    <p>Download: In Progress</p>
+{% endif %}
+{% if drive_job.conversion_status is None %}
+    <p>Video Conversion: Not Started</p>
+{% elif drive_job.conversion_status %}
+    <p>Video Conversion: Completed</p>
+{% else %}
+    <p>Video Conversion: In Progress</p>
+{% endif %}
+{% if drive_job.upload_status is None %}
+    <p>Upload: Not Started</p>
+{% elif drive_job.upload_status %}
+    <p>Upload: Completed</p>
+{% else %}
+    <p>Upload: In Progress</p>
+{% endif %}
+</body>
+</html>

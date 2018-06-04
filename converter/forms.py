@@ -13,4 +13,4 @@ class DriveUrlForm(forms.Form):
     recipient = EmailField()
 
     def save(self):
-        DriveJob.initialize_job(self.cleaned_data['document_url'], self.cleaned_data['quality'], self.cleaned_data['recipient'])
+        return DriveJob.initialize_job(self.cleaned_data['document_url'], self.cleaned_data['quality'], self.cleaned_data['recipient'])

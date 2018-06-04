@@ -41,6 +41,7 @@ class DriveJob(TimeStampedModel):
             conversion_task.delay(drive_job.id)
         else:
             drive_job.execute()
+        return drive_job
 
     def execute(self):
         print('Execute Job: {}, with quality: {} and link: {}'.format(self.id, self.quality, self.drive_shareable_link))
