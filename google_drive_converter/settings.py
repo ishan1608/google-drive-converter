@@ -25,7 +25,7 @@ SECRET_KEY = '-j!e!@7fg1z!kln8g*x-t+q%gy$yt$*sd7-avc)*=txtx_(faz'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
