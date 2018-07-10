@@ -27,15 +27,17 @@ class DriveJob(TimeStampedModel):
     result_link = CharField(max_length=2048, null=True)
     quality = CharField(max_length=8, choices=QUALITY_CHOICES, default='360p')
     recipient_email = EmailField()
+    file_name_suffix = CharField(max_length=1024)
 
     @classmethod
-    def initialize_job(cls, shareable_link, quality, recipient):
+    def initialize_job(cls, shareable_link, quality, recipient, file_name_suffix):
         from celery_tasks import conversion_task
 
         drive_job = DriveJob.objects.create(
             drive_shareable_link=shareable_link,
             quality=quality,
-            recipient_email=recipient
+            recipient_email=recipient,
+            file_name_suffix=file_name_suffix
         )
         if settings.CELERY_ENABLED:
             conversion_task.delay(drive_job.id)
@@ -55,7 +57,7 @@ class DriveJob(TimeStampedModel):
         self.conversion_status = False
         self.save()
 
-        output_file_path = 'downloaded/output-{}.mp4'.format(self.id)
+        output_file_path = 'downloaded/output-{}-{}.mp4'.format(self.id, self.file_name_suffix)
         self.convert_video(downloaded_file_path, output_file_path)
 
         # Upload File
