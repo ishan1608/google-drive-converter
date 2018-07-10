@@ -55,8 +55,17 @@ class DriveJob(TimeStampedModel):
         self.conversion_status = False
         self.save()
 
-        # Convert File
         output_file_path = 'downloaded/output-{}.mp4'.format(self.id)
+        self.convert_video(downloaded_file_path, output_file_path)
+
+        # Upload File
+        self.upload_video(output_file_path)
+
+        # Send email
+        self.send_email()
+
+    def convert_video(self, downloaded_file_path, output_file_path):
+        # Convert File
         log_path = 'downloaded/log-{}.log'.format(self.id)
         VideoConverter.convert(downloaded_file_path, output_file_path, log_path, self.quality)
 
@@ -67,7 +76,7 @@ class DriveJob(TimeStampedModel):
         # Delete downloaded file
         os.remove(downloaded_file_path)
 
-        # Upload File
+    def upload_video(self, output_file_path):
         converted_path = 'converted-{}.mp4'.format(self.id)
         S3Uploader.upload(output_file_path, converted_path)
 
@@ -78,17 +87,16 @@ class DriveJob(TimeStampedModel):
         # Delete Converted File
         os.remove(output_file_path)
 
-        # Send email
-
+    def send_email(self):
         send_mail(
             'Your download is ready',
-'''The file you requested is ready to be downloaded:
-Submitted Link: {}
-Chosen Quality: {}
-Download LInk: {}
---
-http://www.ishan1608.space
-'''.format(self.drive_shareable_link, self.quality, self.result_link),
+            '''The file you requested is ready to be downloaded:
+            Submitted Link: {}
+            Chosen Quality: {}
+            Download LInk: {}
+            --
+            http://www.ishan1608.space
+            '''.format(self.drive_shareable_link, self.quality, self.result_link),
             'notifications-no-reply@ishan1608.space',
             [self.recipient_email]
         )
