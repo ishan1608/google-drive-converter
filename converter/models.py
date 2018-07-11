@@ -50,7 +50,7 @@ class DriveJob(TimeStampedModel):
         self.download_status = False
         self.save()
         # Download File
-        downloaded_file_path = 'downloaded/{}'.format(self.id)
+        downloaded_file_path = 'downloaded/{}-{}'.format(self.id, self.file_name_suffix)
         DriveDownloader().download_shareable_link(self.drive_shareable_link, downloaded_file_path)
 
         self.download_status = True
@@ -68,7 +68,7 @@ class DriveJob(TimeStampedModel):
 
     def convert_video(self, downloaded_file_path, output_file_path):
         # Convert File
-        log_path = 'downloaded/log-{}.log'.format(self.id)
+        log_path = 'downloaded/log-{}-{}.log'.format(self.id, self.file_name_suffix)
         VideoConverter.convert(downloaded_file_path, output_file_path, log_path, self.quality)
 
         self.conversion_status = True
@@ -79,7 +79,7 @@ class DriveJob(TimeStampedModel):
         os.remove(downloaded_file_path)
 
     def upload_video(self, output_file_path):
-        converted_path = 'converted-{}.mp4'.format(self.id)
+        converted_path = 'converted-{}-{}.mp4'.format(self.id, self.file_name_suffix)
         S3Uploader.upload(output_file_path, converted_path)
 
         self.upload_status = True
@@ -96,9 +96,10 @@ class DriveJob(TimeStampedModel):
             Submitted Link: {}
             Chosen Quality: {}
             Download LInk: {}
+            File Name Suffix: {}
             --
             http://www.ishan1608.space
-            '''.format(self.drive_shareable_link, self.quality, self.result_link),
+            '''.format(self.drive_shareable_link, self.quality, self.result_link, self.file_name_suffix),
             'notifications-no-reply@ishan1608.space',
             [self.recipient_email]
         )
