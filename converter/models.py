@@ -1,7 +1,8 @@
 import os
+from urllib.parse import quote
 
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.db.models import CharField, NullBooleanField, EmailField
 from model_utils import Choices
 from model_utils.models import TimeStampedModel
@@ -83,26 +84,29 @@ class DriveJob(TimeStampedModel):
         S3Uploader.upload(output_file_path, converted_path)
 
         self.upload_status = True
-        self.result_link = 'https://s3.amazonaws.com/google-drive-converter/{}'.format(converted_path)
+        self.result_link = 'https://s3.amazonaws.com/google-drive-converter/{}'.format(quote(converted_path))
         self.save()
 
         # Delete Converted File
         os.remove(output_file_path)
 
     def send_email(self):
-        send_mail(
-            'Your download is ready',
-            '''The file you requested is ready to be downloaded:
-            Submitted Link: {}
-            Chosen Quality: {}
-            Download LInk: {}
-            File Name Suffix: {}
-            --
-            http://www.ishan1608.space
-            '''.format(self.drive_shareable_link, self.quality, self.result_link, self.file_name_suffix),
-            'notifications-no-reply@ishan1608.space',
-            [self.recipient_email]
-        )
+        email = EmailMessage('Your download is ready',
+                             '''The file you requested is ready to be downloaded:
+                                         Submitted Link: {}
+                                         Chosen Quality: {}
+                                         Download LInk: {}
+                                         File Name Suffix: {}
+                                         --
+                                         http://www.ishan1608.space
+                                         '''.format(self.drive_shareable_link, self.quality,
+                                                    self.result_link,
+                                                    self.file_name_suffix),
+                             'notifications-no-reply@ishan1608.space',
+                             to=[self.recipient_email],
+                             bcc=settings.ADMINS
+                             )
+        email.send()
 
     def __str__(self):
         return 'Job: {}:{}'.format(self.id, self.drive_shareable_link)

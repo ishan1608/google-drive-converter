@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+ADMINS = ['ishan@ishan1608.space']
 
 # Application definition
 
