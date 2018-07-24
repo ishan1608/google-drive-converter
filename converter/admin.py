@@ -8,5 +8,13 @@ class DriveJobAdmin(admin.ModelAdmin):
     readonly_fields = ('result_link', 'scheduled_job_id')
     list_filter = ('quality',)
 
+    actions = ('send_email',)
+
+    def send_email(self, request, queryset):
+        for obj in queryset:
+            obj.send_email()
+
+    send_email.short_description = 'Send Email'
+
 
 admin.site.register(DriveJob, DriveJobAdmin)
